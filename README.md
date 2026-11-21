@@ -22,6 +22,7 @@ This is a Go implementation of the [GitHub Readme Stats (anuraghazra)](https://g
 - ✅ Top Languages card generation
 - ✅ Gist card generation
 - ✅ WakaTime card generation
+- ✅ Composite card generation (combine 2–3 cards into one embeddable SVG)
 
 ## Examples / 示例展示
 
@@ -149,6 +150,26 @@ Use `locale=pt-br` with the stats, repository pin, and WakaTime endpoints as wel
 ![WakaTime Test Limited](.github/assets/wakatime-test-limited.svg)
 
 > **Note:** WakaTime card examples require a valid WakaTime username with public stats. The test images above are generated using test data to demonstrate various configuration options.
+
+### Composite Card
+
+Combine two or three existing cards into a single SVG so the cards share one
+background, gap and padding when embedded on their own.
+
+**Horizontal (default):**
+```markdown
+![Composite](http://localhost:9000/api/composite?username=yourname&repo=repo-name&cards=stats,top-langs&layout=horizontal&gap=16&theme=dark)
+```
+
+**Vertical with padding:**
+```markdown
+![Composite](http://localhost:9000/api/composite?username=yourname&repo=repo-name&cards=stats,pin&layout=vertical&gap=12&padding=8&theme=dark)
+```
+
+The output keeps each sub-card's title and data, computes the canvas from the
+rendered card sizes, and namespaces gradient, mask, clip-path and animation ids
+so they never collide. A card whose data cannot be fetched is reported as a
+`Card data unavailable` error SVG instead of a half-rendered composite.
 
 ## Quick Start
 
@@ -439,6 +460,33 @@ GET /api/wakatime?username=USERNAME
 - `locale` - Language code
 
 > See examples above for usage.
+
+### Composite Card
+
+Combine two or three cards into a single SVG.
+
+```
+GET /api/composite?username=USERNAME&repo=REPO&cards=stats,pin
+```
+
+**Parameters:**
+- `username` (required) - GitHub username
+- `cards` (required) - 2–3 distinct card kinds, comma-separated: `stats`, `pin`, `top-langs`
+- `layout` - `horizontal` (default) or `vertical`
+- `gap` - Space between cards in px (0–80, default 16)
+- `padding` - Outer padding in px (0–80, default 0)
+- `font` - Font family applied to all sub-card text (letters, digits, spaces, `.`, `-`, `_`; max 64 chars)
+- `repo` (required when `pin` is selected) - Repository name
+- `theme`, `bg_color`, `title_color`, `text_color`, `icon_color`, `border_color` - Shared colors
+- `border_radius`, `locale`, `disable_animations` - Shared card options
+- `card_width`, `hide`, `hide_title`, `hide_border`, `langs_count`, `show_icons`, `hide_rank`, `include_all_commits` - Applied to the relevant sub-cards
+
+**Responses:**
+- Invalid layout, card selection, gap, padding, font, or a missing `username`/`repo` returns an error SVG with HTTP 400.
+- A failed data fetch for any selected card returns a `Card data unavailable: <card>` error SVG with HTTP 200 (matching the single-card endpoints).
+- A layout larger than 4096×4096 px is rejected with an error SVG instead of an unbounded image.
+
+The single-card endpoints (`/api`, `/api/pin`, `/api/top-langs`) are unchanged.
 
 ## Project Structure
 

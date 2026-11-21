@@ -45,6 +45,7 @@ func main() {
 		apiGroup.GET("/top-langs", api.TopLangsHandler)
 		apiGroup.GET("/gist", api.GistHandler)
 		apiGroup.GET("/wakatime", api.WakaTimeHandler)
+		apiGroup.GET("/composite", api.CompositeHandler)
 	}
 
 	// Get port from environment or use default
@@ -93,6 +94,8 @@ func runCLI() error {
 			cardType = "gist"
 		case "/api/wakatime":
 			cardType = "wakatime"
+		case "/api/composite":
+			cardType = "composite"
 		default:
 			return fmt.Errorf("unknown API path: %s", path)
 		}
@@ -164,7 +167,7 @@ func runCLI() error {
 		}
 
 		if cardType == "" {
-			return fmt.Errorf("--type is required (options: stats, pin, top-langs, gist, wakatime)")
+			return fmt.Errorf("--type is required (options: stats, pin, top-langs, gist, wakatime, composite)")
 		}
 	}
 
@@ -180,8 +183,10 @@ func runCLI() error {
 		return api.GenerateGistCard(params, outputPath)
 	case "wakatime":
 		return api.GenerateWakaTimeCard(params, outputPath)
+	case "composite":
+		return api.GenerateCompositeCard(params, outputPath)
 	default:
-		return fmt.Errorf("unknown card type: %s (options: stats, pin, top-langs, gist, wakatime)", cardType)
+		return fmt.Errorf("unknown card type: %s (options: stats, pin, top-langs, gist, wakatime, composite)", cardType)
 	}
 }
 
@@ -197,9 +202,10 @@ URL Format:
   /api/top-langs?username=xxx
   /api/gist?id=xxx
   /api/wakatime?username=xxx
+  /api/composite?username=xxx&repo=xxx&cards=stats,pin&layout=horizontal
 
 Flag Format:
-  --type=TYPE                     # Card type (required): stats, pin, top-langs, gist, wakatime
+  --type=TYPE                     # Card type (required): stats, pin, top-langs, gist, wakatime, composite
   --output=FILE                   # Output file path (default: stdout)
   --username=USER                 # GitHub username
   --theme=THEME                   # Theme name

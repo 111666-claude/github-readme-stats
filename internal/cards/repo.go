@@ -28,6 +28,9 @@ type RepoCardOptions struct {
 	BorderColor           string
 	Locale                string
 	DescriptionLinesCount int
+	// TruncateTitle clips an over-long header to the card width. It is opt-in
+	// so the original single-card endpoint keeps its exact output.
+	TruncateTitle bool
 }
 
 // RenderRepoCard renders the repository card
@@ -165,13 +168,14 @@ func RenderRepoCard(repo *fetchers.RepoData, options RepoCardOptions) string {
 
 	// Create card
 	card := NewCard(CardOptions{
-		Width:        400,
-		Height:       height,
-		BorderRadius: options.BorderRadius,
-		Colors:       colors,
-		DefaultTitle: header,
-		HideBorder:   options.HideBorder,
-		CSS:          getRepoStyles(colors),
+		Width:         400,
+		Height:        height,
+		BorderRadius:  options.BorderRadius,
+		Colors:        colors,
+		DefaultTitle:  header,
+		HideBorder:    options.HideBorder,
+		TitleMaxWidth: options.TruncateTitle,
+		CSS:           getRepoStyles(colors),
 	})
 
 	// Build body

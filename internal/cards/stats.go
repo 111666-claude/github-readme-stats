@@ -53,6 +53,9 @@ type StatsCardOptions struct {
 	DisableAnimations bool
 	RankIcon          string
 	Show              []string
+	// TruncateTitle clips an over-long header to the card width. It is opt-in
+	// so the original single-card endpoint keeps its exact output.
+	TruncateTitle bool
 }
 
 // RenderStatsCard renders the stats card
@@ -373,6 +376,7 @@ func RenderStatsCard(stats *fetchers.StatsData, options StatsCardOptions) string
 		HideBorder:        options.HideBorder,
 		HideTitle:         options.HideTitle,
 		DisableAnimations: options.DisableAnimations,
+		TitleMaxWidth:     options.TruncateTitle,
 		CSS:               getStatsStyles(colors, options.ShowIcons, progress),
 	})
 

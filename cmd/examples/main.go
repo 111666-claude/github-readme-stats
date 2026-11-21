@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/soulteary/github-readme-stats/internal/api"
@@ -167,6 +168,21 @@ func main() {
 			},
 			OutputPath: filepath.Join(outputDir, "wakatime-compact.svg"),
 		},
+
+		// Composite Example
+		{
+			Name:        "composite-horizontal",
+			Description: "Stats, pin and top languages combined side by side",
+			Params: map[string]string{
+				"username": "anuraghazra",
+				"repo":     "github-readme-stats",
+				"cards":    "stats,pin,top-langs",
+				"layout":   "horizontal",
+				"gap":      "16",
+				"theme":    "dark",
+			},
+			OutputPath: filepath.Join(outputDir, "composite-horizontal.svg"),
+		},
 	}
 
 	// 检查是否指定了特定的示例
@@ -213,6 +229,8 @@ func main() {
 			err = api.GenerateGistCard(example.Params, example.OutputPath)
 		case example.Name[:8] == "wakatime":
 			err = api.GenerateWakaTimeCard(example.Params, example.OutputPath)
+		case strings.HasPrefix(example.Name, "composite"):
+			err = api.GenerateCompositeCard(example.Params, example.OutputPath)
 		}
 
 		if err != nil {
@@ -486,5 +504,6 @@ func getAllExamples() []ExampleConfig {
 		{"gist-basic", "Basic gist pin card", nil, ""},
 		{"wakatime-basic", "Basic WakaTime stats card", nil, ""},
 		{"wakatime-compact", "Compact WakaTime stats card", nil, ""},
+		{"composite-horizontal", "Stats, pin and top languages in one SVG", nil, ""},
 	}
 }

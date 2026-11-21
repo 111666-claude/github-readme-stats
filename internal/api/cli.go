@@ -617,3 +617,54 @@ func GenerateWakaTimeCard(params map[string]string, outputPath string) error {
 
 	return writeOutput(cardSVG, outputPath)
 }
+
+// GenerateCompositeCard generates a composite card from parameters
+func GenerateCompositeCard(params map[string]string, outputPath string) error {
+	request := CompositeRequest{
+		Username:          getParam(params, "username", ""),
+		Repo:              getParam(params, "repo", ""),
+		Cards:             getParam(params, "cards", ""),
+		Layout:            getParam(params, "layout", ""),
+		Gap:               getParam(params, "gap", ""),
+		Padding:           getParam(params, "padding", ""),
+		FontFamily:        getParam(params, "font", ""),
+		Theme:             getParam(params, "theme", ""),
+		TitleColor:        getParam(params, "title_color", ""),
+		TextColor:         getParam(params, "text_color", ""),
+		IconColor:         getParam(params, "icon_color", ""),
+		BgColor:           getParam(params, "bg_color", ""),
+		BorderColor:       getParam(params, "border_color", ""),
+		Locale:            getParam(params, "locale", ""),
+		BorderRadius:      getParam(params, "border_radius", ""),
+		DisableAnimations: getParam(params, "disable_animations", ""),
+		CardWidth:         getParam(params, "card_width", ""),
+		Hide:              getParam(params, "hide", ""),
+		HideTitle:         getParam(params, "hide_title", ""),
+		HideBorder:        getParam(params, "hide_border", ""),
+		LangsCount:        getParam(params, "langs_count", ""),
+		ShowIcons:         getParam(params, "show_icons", ""),
+		HideRank:          getParam(params, "hide_rank", ""),
+		IncludeAllCommits: getParam(params, "include_all_commits", ""),
+	}
+
+	colors := map[string]string{
+		"title_color":  request.TitleColor,
+		"text_color":   request.TextColor,
+		"bg_color":     request.BgColor,
+		"border_color": request.BorderColor,
+		"theme":        request.Theme,
+	}
+
+	passed, errorSVG := GuardAccessCLI(request.Username, "username", colors)
+	if !passed {
+		return writeOutput(errorSVG, outputPath)
+	}
+
+	svg, err := BuildCompositeSVG(request)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return writeOutput(renderCompositeError(err, colors), outputPath)
+	}
+
+	return writeOutput(svg, outputPath)
+}

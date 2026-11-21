@@ -22,6 +22,7 @@
 - ✅ Top Languages 卡片生成
 - ✅ Gist 卡片生成
 - ✅ WakaTime 卡片生成
+- ✅ 组合卡片生成（将 2–3 张卡片合成一张可单独嵌入的 SVG）
 
 ## 示例展示
 
@@ -141,6 +142,22 @@
 ![WakaTime Test Limited](.github/assets/wakatime-test-limited.svg)
 
 > **注意：** WakaTime 卡片示例需要有效的 WakaTime 用户名和公开统计数据。上述测试图片使用测试数据生成，用于展示各种配置选项。
+
+### 组合卡片
+
+将两张或三张现有卡片合成一张 SVG，使它们在同一张图中共享背景、间距和边距，单独嵌入时不会出现颜色和边距不齐的问题。
+
+**水平排列（默认）：**
+```markdown
+![组合卡片](http://localhost:9000/api/composite?username=yourname&repo=repo-name&cards=stats,top-langs&layout=horizontal&gap=16&theme=dark)
+```
+
+**垂直排列并设置外边距：**
+```markdown
+![组合卡片](http://localhost:9000/api/composite?username=yourname&repo=repo-name&cards=stats,pin&layout=vertical&gap=12&padding=8&theme=dark)
+```
+
+输出保留每张子卡片的标题和数据，根据实际渲染尺寸计算整体画布，并为渐变、mask、clipPath 和动画名称添加前缀，避免 ID 冲突。若某张卡片的数据获取失败，会返回带 `Card data unavailable` 提示的错误 SVG，而不会输出残缺的组合图。
 
 ## 快速开始
 
@@ -447,6 +464,33 @@ GET /api/wakatime?username=USERNAME
 - `locale` - 语言代码
 
 > 使用示例请参考上方。
+
+### 组合卡片
+
+将两张或三张卡片合成一张 SVG。
+
+```
+GET /api/composite?username=USERNAME&repo=REPO&cards=stats,pin
+```
+
+**参数：**
+- `username` (必需) - GitHub 用户名
+- `cards` (必需) - 选择 2–3 种不同卡片，逗号分隔：`stats`、`pin`、`top-langs`
+- `layout` - `horizontal`（默认）或 `vertical`
+- `gap` - 卡片间距（px，0–80，默认 16）
+- `padding` - 外边距（px，0–80，默认 0）
+- `font` - 应用于所有子卡片文字的字体系列（字母、数字、空格、`.`、`-`、`_`，最长 64 字符）
+- `repo` (选择 `pin` 时必需) - 仓库名
+- `theme`、`bg_color`、`title_color`、`text_color`、`icon_color`、`border_color` - 共享颜色
+- `border_radius`、`locale`、`disable_animations` - 共享卡片选项
+- `card_width`、`hide`、`hide_title`、`hide_border`、`langs_count`、`show_icons`、`hide_rank`、`include_all_commits` - 应用到相关子卡片
+
+**响应：**
+- 无效的布局、卡片选择、间距、边距、字体，或缺少 `username`/`repo` 时，返回 HTTP 400 的错误 SVG。
+- 任一选中卡片的数据获取失败时，返回 HTTP 200 的 `Card data unavailable: <card>` 错误 SVG（与单卡端点一致）。
+- 超过 4096×4096 px 的画布会被拒绝并返回错误 SVG，而不是生成无限大的图片。
+
+原有单卡端点（`/api`、`/api/pin`、`/api/top-langs`）保持不变。
 
 ## 项目结构
 

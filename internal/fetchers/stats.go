@@ -12,11 +12,6 @@ import (
 	"github.com/soulteary/github-readme-stats/internal/common"
 )
 
-const (
-	graphQLURL = "https://api.github.com/graphql"
-	restAPIURL = "https://api.github.com/search/commits"
-)
-
 // GraphQLReposField is the GraphQL query field for repositories
 const GraphQLReposField = `
   repositories(first: 100, ownerAffiliations: OWNER, orderBy: {direction: DESC, field: STARGAZERS}, after: $after) {
@@ -244,7 +239,7 @@ func StatsFetcher(params StatsFetcherParams) (*GraphQLResponse, error) {
 
 // FetchTotalCommits fetches total commits using REST API
 func FetchTotalCommits(username string) (int, error) {
-	url := fmt.Sprintf("%s?q=author:%s", restAPIURL, username)
+	url := fmt.Sprintf("%s?q=author:%s", common.GitHubRESTURL("/search/commits"), username)
 
 	resp, err := common.Retryer(func(v interface{}, token string) (*http.Response, error) {
 		return common.RequestREST("GET", url, token, nil)

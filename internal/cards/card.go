@@ -48,6 +48,14 @@ func NewCard(options CardOptions) *Card {
 		title = options.CustomTitle
 	}
 
+	if options.TitleMaxWidth {
+		available := width - 2*25
+		if options.TitlePrefixIcon != "" {
+			available -= 41 // 16px icon + 25px flex gap
+		}
+		title = common.TruncateTextToWidth(title, available, 18)
+	}
+
 	return &Card{
 		Width:           width,
 		Height:          height,
@@ -76,6 +84,7 @@ type CardOptions struct {
 	HideBorder        bool
 	HideTitle         bool
 	DisableAnimations bool
+	TitleMaxWidth     bool
 	CSS               string
 }
 

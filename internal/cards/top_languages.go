@@ -47,6 +47,9 @@ type TopLanguagesCardOptions struct {
 	DisableAnimations bool
 	HideProgress      bool
 	StatsFormat       string
+	// TruncateTitle clips an over-long header to the card width. It is opt-in
+	// so the original single-card endpoint keeps its exact output.
+	TruncateTitle bool
 }
 
 // LanguageWithPercent represents language with percentage
@@ -187,6 +190,7 @@ func RenderTopLanguages(langs map[string]*fetchers.LanguageStats, options TopLan
 		HideBorder:        options.HideBorder,
 		HideTitle:         options.HideTitle,
 		DisableAnimations: options.DisableAnimations,
+		TitleMaxWidth:     options.TruncateTitle,
 		CSS:               getTopLanguagesStyles(colors),
 	})
 

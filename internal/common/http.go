@@ -6,7 +6,31 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 )
+
+// DefaultGitHubAPIURL is the public GitHub GraphQL/REST base URL.
+const DefaultGitHubAPIURL = "https://api.github.com"
+
+// GitHubAPIURL returns the GitHub API base URL. GITHUB_API_URL may override it
+// for self-hosted proxies, GitHub Enterprise and hermetic tests.
+func GitHubAPIURL() string {
+	if base := os.Getenv("GITHUB_API_URL"); base != "" {
+		return strings.TrimSuffix(base, "/")
+	}
+	return DefaultGitHubAPIURL
+}
+
+// GitHubGraphQLURL returns the GraphQL endpoint URL.
+func GitHubGraphQLURL() string {
+	return GitHubAPIURL() + "/graphql"
+}
+
+// GitHubRESTURL returns a REST API URL for the given path.
+func GitHubRESTURL(path string) string {
+	return GitHubAPIURL() + "/" + strings.TrimPrefix(path, "/")
+}
 
 // GraphQLRequest represents a GraphQL request
 type GraphQLRequest struct {
@@ -30,7 +54,7 @@ func Request(data GraphQLRequest, token string) (*http.Response, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", GitHubGraphQLURL(), bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, err
 	}

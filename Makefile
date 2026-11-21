@@ -23,7 +23,7 @@ build-examples: ## Build the examples generator binary
 clean: ## Clean build artifacts
 	@echo "Cleaning..."
 	rm -rf bin/
-	rm -f .github/assets/*-test.svg .github/assets/stats-*.svg .github/assets/repo-*.svg .github/assets/top-langs-*.svg .github/assets/gist-*.svg .github/assets/wakatime-*.svg
+	rm -f .github/assets/*-test.svg .github/assets/stats-*.svg .github/assets/repo-*.svg .github/assets/top-langs-*.svg .github/assets/gist-*.svg .github/assets/wakatime-*.svg .github/assets/composite-*.svg
 
 test: ## Run tests
 	@echo "Running tests..."

@@ -25,6 +25,9 @@ type GistCardOptions struct {
 	BorderColor  string
 	ShowOwner    bool
 	HideBorder   bool
+	// TruncateTitle clips an over-long header to the card width. It is opt-in
+	// so the original single-card endpoint keeps its exact output.
+	TruncateTitle bool
 }
 
 // RenderGistCard renders the gist card
@@ -135,6 +138,7 @@ func RenderGistCard(gist *fetchers.GistData, options GistCardOptions) string {
 		Colors:          colors,
 		DefaultTitle:    header,
 		TitlePrefixIcon: common.Icons["gist"],
+		TitleMaxWidth:   options.TruncateTitle,
 		HideBorder:      options.HideBorder,
 		CSS:             getGistStyles(colors),
 	})
